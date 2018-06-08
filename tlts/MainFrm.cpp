@@ -1314,9 +1314,6 @@ CString	CMainFrame::GetWoundData(Wound_Judged& wd)
 	vector<BlockData_B> dataB;
 	CString strFileA = "D:/Files/" + strFilePath + ".tpA";
 	CString strFileB = "D:/Files/" + strFilePath + ".tpB";
-	//CString strFileA = "D:/Files/" + m_str + ".tpA";
-	//CString strFileB = "D:/Files/" + strFilePath + ".tpB";
-	//AfxMessageBox(strFileA);
 	if (ReadABData2(strFileA, strFileB, blocks, wd.Block, fHead, dataA, dataB) == 0)
 	{
 		return "";
