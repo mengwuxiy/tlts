@@ -325,12 +325,10 @@ void CMainFrame::OnUpdateApplicationLook(CCmdUI* pCmdUI)
 BOOL CMainFrame::LoadFrame(UINT nIDResource, DWORD dwDefaultStyle, CWnd* pParentWnd, CCreateContext* pContext)
 {
 	// base class does the real work
-
 	if (!CFrameWndEx::LoadFrame(nIDResource, dwDefaultStyle, pParentWnd, pContext))
 	{
 		return FALSE;
 	}
-
 
 	// enable customization button for all user toolbars
 	BOOL bNameValid;
@@ -380,7 +378,6 @@ void	CMainFrame::OnReceive(CSocketEx* sock)
 	{
 		return;
 	}
-	//send(m_curSocket, "123", 4, 0);
 
 	//只处理来自主控软件的信息
 	CString label(temp);
@@ -389,14 +386,12 @@ void	CMainFrame::OnReceive(CSocketEx* sock)
 	CString strData = label.Mid(15);
 	if (strCode == "1000")
 	{
-		//AfxMessageBox("Socket Begin");
 		strData.Replace('\\', '/');
 		this->JudgeTPB(strData, sock);
 	}
 	else if (strCode == "1001")
 	{
 		uint64_t wID = strtoull(temp + 15, NULL, 10);
-		//uint64_t wID = 3;
 		CString strRet = GetMultiCycleWoundData(wID);
 		SendUTF8(strRet, 1003, sock);
 	}
@@ -657,23 +652,6 @@ void CMainFrame::SendWounds(vector<Wound_Judged>& vWounds, CAsyncSocket* sock)
 	}
 }
 
-void CMainFrame::ToUTF8(CString& data, uint16_t code, char* pOut, int* len)
-{
-	const char* pSource = (const char*)(LPCTSTR)data;
-	int nLength = MultiByteToWideChar(CP_ACP, 0, pSource, -1, NULL, NULL);   // 获取缓冲区长度，再分配内存
-	WCHAR *tch = new WCHAR[nLength];
-	nLength = MultiByteToWideChar(CP_ACP, 0, pSource, -1, tch, nLength);     // 将MBCS转换成Unicode
-
-	int nUTF8len = WideCharToMultiByte(CP_UTF8, 0, tch, nLength, 0, 0, 0, 0);   // 获取UTF-8编码长度
-	char *utf8_string = new char[nUTF8len];
-	WideCharToMultiByte(CP_UTF8, 0, tch, nLength, utf8_string, nUTF8len, 0, 0); //转换成UTF-8编码
-	
-	*len = nUTF8len + 15;
-	sprintf_s(pOut, nUTF8len + 15, "%011d%04d%s", nUTF8len + 4, code, utf8_string);
-	delete tch;
-	delete utf8_string;
-}
-
 bool CMainFrame::SendUTF8(CString& data, uint16_t code, CAsyncSocket* sock)
 {
 	const char* pSource = (const char*)(LPCTSTR)data;
@@ -752,9 +730,9 @@ void DoJudge(void* param)
 		}
 	} 
 
-	//AfxMessageBox("Finished");
 	if (!pFrame->m_bJudging)
 	{
+		pFrame->CloseFileAB();
 		return ;
 	}
 
@@ -1363,15 +1341,11 @@ CString CMainFrame::GetMultiCycleWoundData(uint64_t iWoundID)
 	CString strData, strData2, strData3;
 	strData = GetWoundData(wd);
 
-	//wd.LastCycleID = wd.id;
 	if (wd.LastCycleID > 0)
 	{	
 		theApp.sql.GetWound(wd.LastCycleID, wd2);
-		wd2.SizeX2 = wd.SizeX - 1;
-		wd2.SizeY2 = wd.SizeY - 2;
 		strData2 = GetWoundData(wd2);
 
-		//wd2.LastCycleID = wd.id;
 		if (wd2.LastCycleID > 0)
 		{			
 			theApp.sql.GetWound(wd2.LastCycleID, wd3);

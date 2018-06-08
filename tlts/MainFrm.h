@@ -146,7 +146,6 @@ public:
 	CString				GetMultiCycleWoundData(uint64_t iWoundID);
 
 public:
-	void				ToUTF8(CString& data, uint16_t code, char* pOut, int* len);
 	bool				SendUTF8(CString& data, uint16_t code, CAsyncSocket* sock);
 };
 

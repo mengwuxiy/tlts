@@ -1,4 +1,6 @@
-#pragma once
+#ifndef CSOCKETEX_H
+#define CSOCKETEX_H
+
 // CSocketEx command target
 
 class CSocketEx : public CAsyncSocket
@@ -21,4 +23,5 @@ public:
 	void		SetParent(DWORD_PTR frame);
 };
 
+#endif
 

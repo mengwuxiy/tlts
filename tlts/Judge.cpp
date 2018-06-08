@@ -69,16 +69,6 @@ vector<Curve> vCurves;
 vector<Bridge> vBridges;
 vector<Tunnel> vTunnels;
 
-
-//UINT16 rail_hDC[4] = { 33, 35, 38, 46 };		// 轨头内的内外70度反射点的高度mm）
-//UINT16 rail_uDC[4] = { 140, 152, 176, 192 };    // 轨底高度
-//float g_A_L1[4] = { 78.780945, 82.996033, 90.973236, 109.27811 };
-//TRIANGLE g_a[4] = { { 0.89503974, 0.44598642, 2.0068767 },
-//{ 0.90143627, 0.43291181, 2.082263 },
-//{ 0.89503974, 0.44598642, 2.0068767 },
-//{ 0.90143627, 0.43291181, 2.082263 } };
-
-
 Position_Mark::Position_Mark()
 {
 	memset(this, 0, sizeof(Position_Mark));
@@ -1514,7 +1504,7 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 					FillWound(wound, blockHead, head);
 					wound.vCRs.push_back(cr);
 
-					if (cr.Row1 <= 13 && cr.Row2 >= 13)//轨鄂连贯，不管位移，不管赋值，就可以判伤（焊缝除外）
+					if (cr.Row1 <= 13 && cr.Row2 >= 13)//轨鄂连贯伤
 					{
 						if (crInfo.MaxV >= 150 && crInfo.Shift >= 30)
 						{
@@ -2874,58 +2864,9 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 						memcpy(wound.Result, "螺孔", 20);
 					}
 				}
-
-				//if (blocks[0].Index == 2650)
-				//{
-				//	CString strLog;
-				//	strLog.Format("***%3d %6d %3d %6d %3d %6d\n", cr.Channel, cr.Step1, cr.Row1, cr.Step2, cr.Row2, cr.Block);
-				//	WriteLog((char*)(LPCTSTR)strLog);
-				//}
 			}
 		}
 	}
-	//S4 结合历史数据, 位置标记判伤，筛伤
-	/*
-	if (vWounds.size() > 0)
-	{
-	CString strWounds;
-	strWounds.Format("1_data:{rail:{name:%s,xingbie:%s,gubie:%s,w_mil:K%.3lf - },detail:[", strRailNo, strXingBieDefines[xingbie], strGuBieDefines[gubie], startPos);
-	CString strTemp;
-	for (int i = 0; i < vWounds.size(); ++i)
-	{
-	strTemp.Format("{lat:'%lf',lng:'%lf',time:'%s',w_degree:'%s',line_name:'%s',line_no:'%s',gubie:'%s',place:'%s',w_address:%.5lf,w_id:'0'},",
-	vWounds[i].gps_lat, vWounds[i].gps_log, vWounds[i].FoundTime, strDegreeDefines[vWounds[i].Degree], strTypeDefines[vWounds[i].Type], strRailNo, strGuBieDefines[gubie],
-	strWoundPlaceDefines[vWounds[i].Place], vWounds[i].Walk);
-	strWounds += strTemp;
-	}
-	strWounds = strWounds.Left(strWounds.GetLength() - 1);
-	strTemp.Format("],wtype_count_detail:{info:{licheng:'本次探伤%.3lfKm',count : '共检查出%d个伤损'},header : {index:'序号',licheng : '里程',	  wdpostion : '伤损位置', wdtype : '伤损类型', wdchengdu : '伤损程度'},data:[",
-	head.distance * head.step / 1000000, vWounds.size());
-	strWounds += strTemp;
-	for (int i = 0; i < vWounds.size(); ++i)
-	{
-	strTemp.Format("index:'%03d',licheng:'%.1lf',wdpostion : '%s',wdtype : '%s',wdchengdu : '%s'，status : '%s'},",
-	i + 1, vWounds[i].Walk, strWoundPlaceDefines[vWounds[i].Place], strTypeDefines[vWounds[i].Type], strDegreeDefines[vWounds[i].Degree], strCheckStateDefines[vWounds[i].Checked]);
-	strWounds += strTemp;
-	}
-	strWounds = strWounds.Left(strWounds.GetLength() - 1) + "]}}}";
-
-	const char* pSource = (const char*)(LPCTSTR)strWounds;
-	int nLength = MultiByteToWideChar(CP_ACP, 0, pSource, -1, NULL, NULL);   // 获取缓冲区长度，再分配内存
-	WCHAR *tch = new WCHAR[nLength];
-	nLength = MultiByteToWideChar(CP_ACP, 0, pSource, -1, tch, nLength);     // 将MBCS转换成Unicode
-
-	int nUTF8len = WideCharToMultiByte(CP_UTF8, 0, tch, nLength, 0, 0, 0, 0);   // 获取UTF-8编码长度
-	char *utf8_string = new char[nUTF8len];
-	WideCharToMultiByte(CP_UTF8, 0, tch, nLength, utf8_string, nUTF8len, 0, 0); //转换成UTF-8编码
-
-	send(sclient, utf8_string, nUTF8len, 0);
-	delete utf8_string;
-	delete tch;
-	fseek(pLogFile, 0, SEEK_END);
-	fprintf(pLogFile, "%d\r\n", nUTF8len);
-	}
-	*/
 }
 
 uint8_t	GetAChannelByBChannel(uint8_t iCh)
