@@ -438,6 +438,10 @@ void	ParseSingleScrewHoleByD(F_HEAD& head, BlockData_A& DataA, vector<BlockData_
 	vector<int>&crF, vector<int>& crG, vector<int>& crD, vector<int>& crE, vector<int>& crF2, vector<int>& crG2,
 	vector<Wound_Judged>& vWounds);
 
+void	ParseSingleGuideHoleByD(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR& cr, int i, uint8_t iFRow, uint8_t railType,
+	vector<int>&crF, vector<int>& crG, vector<int>& crD, vector<int>& crE, vector<int>& crF2, vector<int>& crG2,
+	vector<Wound_Judged>& vWounds);
+
 void	Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vector<Wound_Judged>& vWounds, vector<Position_Mark>& vPMs);
 
 //建立连通域
