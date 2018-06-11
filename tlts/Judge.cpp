@@ -2215,7 +2215,7 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 
 						if (bScrewHole) //螺孔
 						{
-							ParseScrewHole(head, DataA, blocks, vCRs, cr, i, iFRow, railType, vWounds);
+							//ParseScrewHole(head, DataA, blocks, vCRs, cr, i, iFRow, railType, vWounds);
 							//检测四象限斜裂纹
 							vector<int> crDt;
 							uint8_t iFindD_4 = GetCR(CH_D, cr.Step1, cr.Row2, cr.Step2, cr.Row2 + 10, blocks, vCRs[CH_D], crDt, i);
