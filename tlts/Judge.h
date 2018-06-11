@@ -430,7 +430,13 @@ void	ParseSewLRH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, 
 
 void	ParseJoint(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR& cr, int iCrIndex, uint8_t iFRow, bool carType, uint8_t railType, vector<int>* t_cr, int& iAStepBig, int &iAStepSmall, vector<Wound_Judged>& vWounds);
 
-void	ParseScrewHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR& cr, int iCrIndex, uint8_t iFRow, bool carType, uint8_t railType, vector<Wound_Judged>& vWounds);
+//判断与接头一起的螺孔
+void	ParseScrewHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, int step1, int step2, uint8_t iFRow, uint8_t railType, int iScrewHoleIndex, vector<Wound_Judged>& vWounds);
+
+//判断单独螺孔
+void	ParseSingleScrewHoleByD(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR& cr, int i, uint8_t iFRow, uint8_t railType,
+	vector<int>&crF, vector<int>& crG, vector<int>& crD, vector<int>& crE, vector<int>& crF2, vector<int>& crG2,
+	vector<Wound_Judged>& vWounds);
 
 void	Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vector<Wound_Judged>& vWounds, vector<Position_Mark>& vPMs);
 

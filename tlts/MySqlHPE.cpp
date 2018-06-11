@@ -12,7 +12,6 @@ FILE* pLogFileMysql = NULL;
 
 CMySqlHPE::CMySqlHPE()
 {
-	pLogFileMysql = fopen("mysql_log.txt", "w+");
 	m_bConnected = false;
 	fseek(pLogFileMysql, 0, SEEK_SET);
 }
@@ -20,12 +19,13 @@ CMySqlHPE::CMySqlHPE()
 
 CMySqlHPE::~CMySqlHPE()
 {
-
+	
 }
 
 
 bool CMySqlHPE::ConnectDatabase(CString host, CString user, CString pwd, CString database)
 {
+	pLogFileMysql = fopen(g_strModuleFolder + "\\mysql_log.txt", "w+"); 
 	MYSQL* pConn = mysql_init(&m_conn);
 	//if (!(mysql_real_connect(&m_conn, "localhost", "root", "", "test", 0, NULL, 0))) 
 	if (!(mysql_real_connect(&m_conn, (char*)(LPCTSTR)host, (char*)(LPCTSTR)user, (char*)(LPCTSTR)pwd, (char*)(LPCTSTR)database, 3306, NULL, MYSQL_OPTION_MULTI_STATEMENTS_ON))) //中间分别是主机，用户名，密码，数据库名，端口号（可以写默认0或者3306等），可以先写成参数再传进去
@@ -44,6 +44,7 @@ bool CMySqlHPE::CloseConn()
 {
 	mysql_close(&m_conn);
 	m_bConnected = false;
+	fclose(pLogFileMysql);
 	return true;
 }
 
@@ -273,7 +274,7 @@ bool CMySqlHPE::Addwork(CString strFile, F_HEAD& head, uint64_t& fileID, CString
 	{
 	//	fprintf(pLogFileMysql, "\t 数据已存在\r\n");
 	//	g_FileID = strtoull(row[0], NULL, 10);
-		//	AfxMessageBox("该数据已存在！", MB_OK | MB_ICONWARNING);
+	//	AfxMessageBox("该数据已存在！", MB_OK | MB_ICONWARNING);
 	//	return false;
 	}
 	mysql_free_result(rs);
