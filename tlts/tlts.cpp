@@ -216,6 +216,8 @@ END_MESSAGE_MAP()
 // App command to run the dialog
 void CtltsApp::OnAppAbout()
 {
+	CMainFrame* pframe = (CMainFrame*)AfxGetApp()->m_pMainWnd;
+	pframe->JudgeTPB("D:/Files/180528Q0008SLS_0006_17S2003.tpB", NULL);
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
 }

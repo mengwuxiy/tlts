@@ -654,6 +654,11 @@ void CMainFrame::SendWounds(vector<Wound_Judged>& vWounds, CAsyncSocket* sock)
 
 bool CMainFrame::SendUTF8(CString& data, uint16_t code, CAsyncSocket* sock)
 {
+	if (sock == NULL)
+	{
+		return true;
+	}
+
 	const char* pSource = (const char*)(LPCTSTR)data;
 	int nLength = MultiByteToWideChar(CP_ACP, 0, pSource, -1, NULL, NULL);   // 获取缓冲区长度，再分配内存
 	WCHAR *tch = new WCHAR[nLength];
@@ -728,6 +733,11 @@ void DoJudge(void* param)
 		{
 			break;
 		}
+
+		//if (pFrame->m_iCurrentBlock >= 100)
+		//{
+		//	break;
+		//}
 	} 
 
 	if (!pFrame->m_bJudging)
@@ -842,7 +852,6 @@ void CMainFrame::JudgeTPB(CString strTpB, CAsyncSocket* sock)
 	}*/
 }
 
-
 void CMainFrame::TravelDir(CString strPath)
 {
 	CString fdPath;
@@ -892,10 +901,39 @@ void CMainFrame::TravelDir(CString strPath)
 	}
 }
 
-
 void CMainFrame::StopJudge()
 {
 	m_bJudging = false;
+}
+
+LRESULT CMainFrame::ONMessageStep(WPARAM wParam, LPARAM lParam)
+{
+	return 0L;
+}
+
+LRESULT CMainFrame::ONMessageFinish(WPARAM wParam, LPARAM lParam)
+{
+	m_bSolving = FALSE;
+	m_bJudging = false;
+	ASYNC_PARAM *p = (ASYNC_PARAM*)lParam;
+	CombineOutputData(m_vPMs, m_vWounds, m_vBlockHeads);
+
+	AddBlocks(m_vBlockHeads, m_vInfoA, m_vInfoB);
+	if (!AddWounds(m_vWounds))
+	{
+		AfxMessageBox("Bad");
+	}
+	AddPMs(m_vPMs);
+
+	m_bLoaded = m_vInfoB.size() > 0;
+	SetEvent(m_jugedHandle);
+
+	CString str;
+	str.Format("%I64d", g_FileID);
+	SendUTF8(str, 1002, p->pSock);
+	delete p;
+	//AfxMessageBox("Finish");
+	return 0L;
 }
 
 void CMainFrame::CombinePM()
@@ -1126,47 +1164,6 @@ uint32_t CMainFrame::ReadABData2(CString strFileA, CString strFileB, vector<BLOC
 	fclose(pFileB);
 	return vASteps.vAStepDatas.size();
 }
-
-LRESULT CMainFrame::ONMessageStep(WPARAM wParam, LPARAM lParam)
-{
-	//if (m_iCurrentBlock < m_Head.block)
-	//{
-	//	if (m_vInfoB.size() > 0)
-	//	{
-	//		m_strProgress.Format(_T("%d/%d"), m_iCurrentBlock, m_Head.block);
-	//	}
-	//}
-	//else
-	//{
-	//	m_Head.block = m_vInfoB.size();
-	//	m_strProgress.Format(_T("%d/%d"), m_vInfoB.size(), m_Head.block);
-	//}
-	//UpdateData(FALSE);
-	return 0L;
-}
-
-LRESULT CMainFrame::ONMessageFinish(WPARAM wParam, LPARAM lParam)
-{
-	m_bSolving = FALSE;
-	m_bJudging = false;
-	ASYNC_PARAM *p = (ASYNC_PARAM*)lParam;
-	CombineOutputData(m_vPMs, m_vWounds, m_vBlockHeads);
-
-	AddBlocks(m_vBlockHeads, m_vInfoA, m_vInfoB);
-	AddWounds(m_vWounds);
-	AddPMs(m_vPMs);
-
-	m_bLoaded = m_vInfoB.size() > 0;
-	SetEvent(m_jugedHandle);
-
-	CString str;
-	str.Format("%I64d", g_FileID);
-	SendUTF8(str, 1002, p->pSock);
-	delete p;
-	//AfxMessageBox("Finish");
-	return 0L;
-}
-
 
 void CMainFrame::GetAString(vector<A_Step>& vASteps, CString& strA)
 {

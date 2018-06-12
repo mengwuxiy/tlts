@@ -13,7 +13,6 @@ FILE* pLogFileMysql = NULL;
 CMySqlHPE::CMySqlHPE()
 {
 	m_bConnected = false;
-	fseek(pLogFileMysql, 0, SEEK_SET);
 }
 
 
@@ -25,7 +24,8 @@ CMySqlHPE::~CMySqlHPE()
 
 bool CMySqlHPE::ConnectDatabase(CString host, CString user, CString pwd, CString database)
 {
-	pLogFileMysql = fopen(g_strModuleFolder + "\\mysql_log.txt", "w+"); 
+	pLogFileMysql = fopen(g_strModuleFolder + "\\mysql_log.txt", "w+");
+	fseek(pLogFileMysql, 0, SEEK_SET);
 	MYSQL* pConn = mysql_init(&m_conn);
 	//if (!(mysql_real_connect(&m_conn, "localhost", "root", "", "test", 0, NULL, 0))) 
 	if (!(mysql_real_connect(&m_conn, (char*)(LPCTSTR)host, (char*)(LPCTSTR)user, (char*)(LPCTSTR)pwd, (char*)(LPCTSTR)database, 3306, NULL, MYSQL_OPTION_MULTI_STATEMENTS_ON))) //中间分别是主机，用户名，密码，数据库名，端口号（可以写默认0或者3306等），可以先写成参数再传进去
