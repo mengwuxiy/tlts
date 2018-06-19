@@ -91,9 +91,7 @@ typedef struct _Connected_Region
 	uint8_t				Flag;	//是否判断过了
 	vector<WaveData>	Region;
 	vector<A_Step>		vASteps;//对应的A超数据
-
-	uint64_t			WorkID;
-	uint64_t			CRID;	//连通域标识
+	uint16_t			Index;	//连通域标识
 }Connected_Region, CR;
 
 typedef  vector<Connected_Region> VCR;
@@ -442,7 +440,7 @@ bool	ParseScrewHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& block
 
 void	ParseJoint(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, int stepF1, int stepF2, uint8_t iFRow, bool carType, uint8_t railType, vector<Wound_Judged>& vWounds);
 
-bool	ParseGuideHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, int step1, int step2, int16_t iFRow, uint8_t railType, int iIndex, vector<Wound_Judged>& vWounds);
+bool	ParseGuideHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR&cr, int i, int16_t iFRow, uint8_t railType, vector<Wound_Judged>& vWounds);
 
 void	Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vector<Wound_Judged>& vWounds, vector<Position_Mark>& vPMs);
 
@@ -536,6 +534,12 @@ void	SetJudgedFlag(vector<Connected_Region>& vCR, vector<int>& idx, int Flag);
 void	AddWoundData(Wound_Judged& wound, vector<Connected_Region>& vCR, vector<int>& idx);
 
 void	AddToWounds(vector<Wound_Judged>& vWounds, Wound_Judged& w);
+
+uint64_t IsInBridge(double walk, vector<Bridge>& vBridges, int& iBeginIndex);
+
+uint64_t	IsInCurve(double walk, vector<Curve>& vCurves, int& iBeginIndex);
+
+uint64_t	IsInTunnel(double walk, vector<Tunnel>& vTunnels, int& iBeginIndex);
 
 void	CombineOutputData(vector<Position_Mark>& vPMs, vector<Wound_Judged>& vWounds, vector<BLOCK>& blockheads);
 

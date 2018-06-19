@@ -6,9 +6,6 @@
 #include <WinSock2.h>
 #pragma comment(lib,"ws2_32.lib") 
 
-//char ChannelNames[13] = "AaBbCDdFceEG";
-//CString ChannelNamesB[16] = { "A1", "A2", "a1", "a2", "B1", "B2", "b1", "b2", "C", "c", "D", "d", "E", "e", "F", "G" };
-
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -204,7 +201,6 @@ void CombineD(vector<Connected_Region> &vCR)
 		}
 		for (int i_LastFind = idx + 1; i_LastFind < vCR.size(); ++i_LastFind)
 		{
-
 			if (vCR[i_LastFind].Step1 - vCR[idx].Step2 > 10)
 			{
 				break;
@@ -595,7 +591,6 @@ void CreateCR(vector<BlockData_B>& datas, vector<Connected_Region>* vCRs)
 					break;
 				}
 			}
-
 			++idx;
 		}
 	}
@@ -1222,6 +1217,7 @@ void	ParseSewCH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, V
 							if (vCRs[j][t_cr[j][k]].Row1 <= 8)
 							{
 								Wound_Judged wound;
+								FillWound(wound, blockHead, head);
 								wound.Block = vCRs[j][t_cr[j][k]].Block;
 								wound.Step = vCRs[j][t_cr[j][k]].Step;
 								wound.Walk = GetWD(blocks[mBlockIndex[wound.Block]].BlockHead.walk, wound.Step, head.step);
@@ -1231,7 +1227,6 @@ void	ParseSewCH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, V
 								wound.Degree = 4;
 								wound.SizeX = 3.0 * (vCRs[j][t_cr[j][k]].Row2 - vCRs[j][t_cr[j][k]].Row1);
 								wound.SizeY = head.step * (vCRs[j][t_cr[j][k]].Step2 - vCRs[j][t_cr[j][k]].Step1);
-								FillWound(wound, blockHead, head);
 								sprintf_s(wound.According, "%s出波，位移：%.1f大格，幅值%d，大于5大格出波", ChannelNamesB[j], 0.02f * t_info.Shift, t_info.MaxV);
 								AddToWounds(vWounds, wound);
 								break;
@@ -1265,6 +1260,7 @@ void	ParseSewLRH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, 
 						if (t_info.MaxV >= 150 && t_info.Shift >= 25)
 						{
 							Wound_Judged wound;
+							FillWound(wound, blockHead, head);
 							wound.Block = vCRs[j][t_cr[j][k]].Block;
 							wound.Step = vCRs[j][t_cr[j][k]].Step;
 							wound.Walk = GetWD(blocks[mBlockIndex[wound.Block]].BlockHead.walk, wound.Step, head.step);
@@ -1288,7 +1284,6 @@ void	ParseSewLRH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, 
 							wound.Degree = 4;
 							wound.SizeX = 3.0 * (vCRs[j][t_cr[j][k]].Row2 - vCRs[j][t_cr[j][k]].Row1);
 							wound.SizeY = head.step * (vCRs[j][t_cr[j][k]].Step2 - vCRs[j][t_cr[j][k]].Step1);
-							FillWound(wound, blockHead, head);
 							sprintf_s(wound.According, "%s出波，位移：%.1f大格，幅值%d", ChannelNamesB[j], 0.02f * t_info.Shift, t_info.MaxV);
 							AddToWounds(vWounds, wound);
 							break;
@@ -1309,6 +1304,7 @@ void	ParseSewLRH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, 
 						if (t_info.MaxV >= 150 && t_info.MaxH - t_info.MinH >= 25)
 						{
 							Wound_Judged wound;
+							FillWound(wound, blockHead, head);
 							wound.Block = vCRs[j][t_cr[j][k]].Block;
 							wound.Step = vCRs[j][t_cr[j][k]].Step;
 							wound.Walk = GetWD(blocks[mBlockIndex[wound.Block]].BlockHead.walk, wound.Step, head.step);
@@ -1332,7 +1328,6 @@ void	ParseSewLRH(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, 
 							wound.Degree = 4;
 							wound.SizeX = 3.0 * (vCRs[j][t_cr[j][k]].Row2 - vCRs[j][t_cr[j][k]].Row1);
 							wound.SizeY = head.step * (vCRs[j][t_cr[j][k]].Step2 - vCRs[j][t_cr[j][k]].Step1);
-							FillWound(wound, blockHead, head);
 							sprintf_s(wound.According, "%s出波，位移：%.1f大格，幅值%d", ChannelNamesB[j], 0.02f * t_info.Shift, t_info.MaxV);
 							AddToWounds(vWounds, wound);
 							break;
@@ -1353,18 +1348,18 @@ bool	ParseScrewHoleSew1(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vect
 		int iEStep2 = vCRs[CH_E][crEt[k]].Step2;
 		if (iEStep2 < vF.Step2 - 2)//E早于F结束，说明E是伤损
 		{
+			FillWound(w, blockHead, head);
 			w.Block = vCRs[CH_E][crEt[k]].Block;
 			w.Step = vCRs[CH_E][crEt[k]].Step;
 			w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
-			FillWound(w, blockHead, head);
 			w.Degree = 4;
 			memcpy(w.Result, "螺孔一象限斜裂纹", 30);
-			w.Place = WP_WAIST;
 			w.Type = WOUND_TYPE::W_SCREW_CRACK1;
-			AddWoundData(w, vCRs[CH_E], crEt);
+			w.Place = WP_WAIST;
 			w.SizeX = (vCRs[CH_E][crEt[k]].Row2 - vCRs[CH_E][crEt[k]].Row1) / 0.6;
 			w.SizeY = 1;
 			sprintf_s(w.According, "E出波，且早于F结束");
+			AddWoundData(w, vCRs[CH_E], crEt);
 			break;
 		}
 	}
@@ -1387,13 +1382,13 @@ bool	ParseScrewHoleSew2(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vect
 		CR_INFO info_2;
 		if (vCRs[CH_D][crD[k]].Row1 < vF.Row1 && GetCRInfo(vCRs[CH_D][crD[k]], info_2, DataA, blocks, angle, offset, head.step, angle, head.deviceP2.Trig[ACH_D], blockHead.gain[ACH_D]) && info_2.MaxV >= 150)
 		{
+			FillWound(w, blockHead, head);
 			w.Block = vCRs[CH_D][crD[k]].Block;
 			w.Step = vCRs[CH_D][crD[k]].Step;
 			w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
 			w.Type = WOUND_TYPE::W_SCREW_CRACK2;
 			w.Place = WP_WAIST;
 			w.Degree = 4;
-			FillWound(w, blockHead, head);
 			w.SizeX = (vCRs[CH_D][crD[k]].Row2 - vCRs[CH_D][crD[k]].Row1) / 0.6;
 			w.SizeY = 1;
 			sprintf_s(w.According, "D出波，位移：%.1f大格，幅值:%d", 0.02f * info_2.Shift, info_2.MaxV);
@@ -1408,7 +1403,6 @@ bool	ParseScrewHoleSew2(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vect
 
 bool	ParseScrewHoleSew3(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR& vF, uint8_t railType, Wound_Judged& w)
 {
-	FillWound(w, blockHead, head);
 	vector<int> crEt;
 	uint8_t iFindE_1 = GetCR(CH_E, vF.Step2 - 1, vF.Row2 - 1, vF.Step2 + 5, vF.Row2 + 5, blocks, vCRs[CH_E], crEt);
 	double angle = head.deviceP2.Angle[ACH_E].Refrac;
@@ -1420,6 +1414,7 @@ bool	ParseScrewHoleSew3(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vect
 		{
 			if (GetCRInfo(vCRs[CH_E][crEt[k]], info_3, DataA, blocks, angle, offset, head.step, head.deviceP2.Restr[ACH_E], head.deviceP2.Trig[ACH_E], blockHead.gain[ACH_E]) && info_3.MaxV >= 150)
 			{
+				FillWound(w, blockHead, head);
 				w.Block = vCRs[CH_E][crEt[k]].Block;
 				w.Step = vCRs[CH_E][crEt[k]].Step;
 				w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
@@ -1452,13 +1447,13 @@ bool	ParseScrewHoleSew4(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA, vect
 			CR_INFO info_2;
 			if (vCRs[CH_D][crD[k]].Row1 < vF.Row1 && GetCRInfo(vCRs[CH_D][crD[k]], info_2, DataA, blocks, angle, offset, head.step, angle, head.deviceP2.Trig[ACH_D], blockHead.gain[ACH_D]) && info_2.MaxV >= 150)
 			{
+				FillWound(w, blockHead, head);
 				w.Block = vCRs[CH_D][crD[k]].Block;
 				w.Step = vCRs[CH_D][crD[k]].Step;
 				w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
 				w.Type = WOUND_TYPE::W_SCREW_CRACK4;
 				w.Place = WP_WAIST;
 				w.Degree = 4;
-				FillWound(w, blockHead, head);
 				w.SizeX = (vCRs[CH_D][crD[k]].Row2 - vCRs[CH_D][crD[k]].Row1) / 0.6;
 				w.SizeY = 1;
 				sprintf_s(w.According, "D出波，位移：%.1f大格，幅值:%d", 0.02f * info_2.Shift, info_2.MaxV);
@@ -1497,6 +1492,7 @@ bool	ParseScrewHoleCrackLeft(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA,
 		}
 		else
 		{
+			FillWound(w, blockHead, head);
 			w.Block = vCRs[vCh][vF[k]].Block;
 			w.Step = vCRs[vCh][vF[k]].Step;
 			w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
@@ -1506,8 +1502,6 @@ bool	ParseScrewHoleCrackLeft(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA,
 			w.SizeX = head.step * (vCRs[vCh][vF[k]].Step2 - vCRs[vCh][vF[k]].Step1);
 			w.SizeY = 1;
 			sprintf_s(w.According, "%s出波", ChannelNamesB[vCh]);
-			FillWound(w, blockHead, head);
-
 			memcpy(w.Result, "螺孔左侧水平裂纹", 30);
 			w.Degree = 4;
 		}
@@ -1542,6 +1536,7 @@ bool	ParseScrewHoleCrackRight(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA
 		}
 		else
 		{
+			FillWound(w, blockHead, head);
 			w.Block = vCRs[vCh][vF[k]].Block;
 			w.Step = vCRs[vCh][vF[k]].Step;
 			w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
@@ -1551,7 +1546,6 @@ bool	ParseScrewHoleCrackRight(F_HEAD& head, BLOCK& blockHead, BlockData_A& DataA
 			w.SizeX = head.step * (vCRs[vCh][vF[k]].Step2 - vCRs[vCh][vF[k]].Step1);
 			w.SizeY = 1;
 			sprintf_s(w.According, "%s出波", ChannelNamesB[vCh]);
-			FillWound(w, blockHead, head);
 
 			memcpy(w.Result, "螺孔右侧水平裂纹", 30);
 			w.Degree = 4;
@@ -1675,106 +1669,313 @@ bool	ParseScrewHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& block
 	return true;
 }
 
-bool	ParseGuideHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, int step1, int step2, int16_t iFRow, uint8_t railType, int iIndex, vector<Wound_Judged>& vWounds)
+bool	ParseGuideHole(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, VCR* vCRs, CR&cr, int i, int16_t iDesiredFRow, uint8_t railType, vector<Wound_Judged>& vWounds)
 {
-	vector<int> crD, crE, crF, crG, crF2, crG2;
-	uint8_t bFindF = GetCR(CH_F, step1, iLuokong_D_Row1_L[railType], step2, iLuokong_D_Row1_H[railType], blocks, vCRs[CH_F], crF2, -1, 2);//F螺孔高度出波
-	uint8_t bFindG = GetCR(CH_G, step1, iLuokong_D_Row1_L[railType], step2, iLuokong_D_Row1_H[railType], blocks, vCRs[CH_G], crG2, -1, 2);//G螺孔高度出波
+	vector<int> crD, crF, crG, crE, crF2, crG2;
+	double angleD = 0.1 * head.deviceP2.Angle[ACH_D].Refrac;
+	double angleE = 0.1 * head.deviceP2.Angle[ACH_E].Refrac;
 
-	vector<int> vF = crF2;
-	uint8_t iLoseCh = CH_F;
-	if (!bFindF)
+	BLOCK blockHead = blocks[mBlockIndex[cr.Block]].BlockHead;
+	double offsetD = head.deviceP2.Place[ACH_D] + blockHead.probOff[ACH_D];
+	double offsetE = head.deviceP2.Place[ACH_E] + blockHead.probOff[ACH_E];
+
+	uint8_t bFindD = 0, bFindE = 0, bFindF = 0, bFindG = 0, bLoseF = 0, bLoseG = 0;
+	int stepD1 = 0, stepD2 = 0, stepE1 = 0, stepE2 = 0;
+	if (cr.Channel == CH_D)
 	{
-		vF = crG2;
-		iLoseCh = CH_G;
+		bFindD = GetCR(CH_D, cr.Step1 - 1, cr.Row1 - 10, cr.Step2 + 15, cr.Row2 + 10, blocks, vCRs[CH_D], crD, -1, 3);
+		bFindF = GetCR(CH_F, cr.Step1, cr.Row1 - 1, cr.Step2 + 4, cr.Row2, blocks, vCRs[CH_F], crF2, -1, 2);//F螺孔高度出波
+		bFindG = GetCR(CH_G, cr.Step1, cr.Row1 - 1, cr.Step2 + 4, cr.Row2, blocks, vCRs[CH_G], crG2, -1, 2);//G螺孔高度出波
+		bFindE = GetCR(CH_E, cr.Step2 - 1, cr.Row1, cr.Step2 + 15, cr.Row2, blocks, vCRs[CH_E], crE);
+		bLoseF = GetCR(CH_F, cr.Step2 - 1, iDesiredFRow - 3, cr.Step2 + 4, iDesiredFRow + 3, blocks, vCRs[CH_F], crF);
+		bLoseG = GetCR(CH_G, cr.Step2 - 1, iDesiredFRow - 3, cr.Step2 + 4, iDesiredFRow + 3, blocks, vCRs[CH_G], crG);
+	}
+	else if (cr.Channel == CH_E)
+	{
+		bFindF = GetCR(CH_F, cr.Step1, cr.Row1 - 1, cr.Step2 + 4, cr.Row2, blocks, vCRs[CH_F], crF2, -1, 2);//F螺孔高度出波
+		bFindG = GetCR(CH_G, cr.Step1, cr.Row1 - 1, cr.Step2 + 4, cr.Row2, blocks, vCRs[CH_G], crG2, -1, 2);//G螺孔高度出波
+		bLoseF = GetCR(CH_F, cr.Step1 - 5, iDesiredFRow - 3, cr.Step2 + 1, iDesiredFRow + 3, blocks, vCRs[CH_F], crF);
+		bLoseG = GetCR(CH_G, cr.Step1 - 5, iDesiredFRow - 3, cr.Step2 + 1, iDesiredFRow + 3, blocks, vCRs[CH_G], crG);
 	}
 
-	int stepF1 = vCRs[iLoseCh][vF[0]].Step1, stepF2 = vCRs[iLoseCh][vF[0]].Step2;
-	if (crF.size() > 1)
+	if (cr.Channel == CH_D)
 	{
-		AfxMessageBox("double F");
-	}
+		GetStepSteps(cr.Channel, cr, stepD1, stepD2, blocks, angleD, offsetD, head.step);
 
-	uint8_t bFindD = GetCR(CH_D, stepF1 - 5, iLuokong_D_Row1_L[railType], stepF1 + 3, iLuokong_D_Row1_H[railType], blocks, vCRs[CH_D], crD, -1, 3);
-	uint8_t bFindE = GetCR(CH_E, stepF2 - 3, iLuokong_D_Row1_L[railType], stepF2 + 5, iLuokong_D_Row1_H[railType], blocks, vCRs[CH_E], crE, -1, 3);
-
-	uint8_t bLoseF = GetCR(CH_F, stepF1, iFRow - 3, stepF2, iFRow + 3, blocks, vCRs[CH_F], crF);
-	uint8_t bLoseG = GetCR(CH_G, stepF1, iFRow - 3, stepF2, iFRow + 3, blocks, vCRs[CH_G], crG);
-
-
-	//获取crD
-	int idx = -1;
-	if (crD.size() > 0)
-	{
-		idx = 0;
-		int dist = GetDistance(vCRs[CH_D][crD[0]], vCRs[iLoseCh][vF[0]]);
-		for (int i = 1; i < crD.size(); ++i)
+		vector<int> crDt;
+		uint8_t iFindD_4 = GetCR(CH_D, cr.Step1, cr.Row2, cr.Step2, cr.Row2 + 10, blocks, vCRs[CH_D], crDt, i);
+		if (iFindD_4)//D通道检测到伤损
 		{
-			int d = GetDistance(vCRs[CH_D][crD[i]], vCRs[iLoseCh][vF[0]]);
-			if (d < dist)
+			for (int k = 0; k < crDt.size(); ++k)
 			{
-				dist = d;
-				idx = i;
+				if (vCRs[CH_D][crDt[k]].Region.size() < 3)
+				{
+					continue;
+				}
+
+				int step11 = 0, step12 = 0;
+				GetStepSteps(CH_D, vCRs[CH_D][crDt[k]], step11, step12, blocks, angleD, offsetD, head.step);
+				if (step11 >= stepD1 - 1 && step12 <= stepD2 + 1)
+				{
+					SetJudgedFlag(vCRs[CH_D], crDt, 1); //螺孔双波——4象限
+				}
+				else
+				{
+					CR_INFO t_info;
+					if (GetCRInfo(vCRs[CH_D][crDt[k]], t_info, DataA, blocks, angleD, offsetD, head.step, head.deviceP2.Restr[ACH_D], head.deviceP2.Trig[ACH_D], blockHead.gain[ACH_D]) && t_info.MaxV >= 150)
+					{
+						Wound_Judged w;
+						FillWound(w, blockHead, head);
+						w.Block = vCRs[CH_D][crDt[k]].Block;
+						w.Step = vCRs[CH_D][crDt[k]].Step;
+						w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+						w.Type = WOUND_TYPE::W_SCREW_CRACK4;
+						w.Place = WP_WAIST;
+						w.Degree = 4;
+						memcpy(w.Result, "导孔四象限斜裂纹", 30);
+						w.SizeX = head.step * (vCRs[CH_D][crDt[k]].Step2 - vCRs[CH_D][crDt[k]].Step1) / 0.8;
+						w.SizeY = 1;
+						sprintf_s(w.According, "D出波，位移：%.1f大格，幅值：%d", 0.02f * t_info.Shift, t_info.MaxV);
+
+						SetJudgedFlag(vCRs[CH_D], crDt, 1);
+						w.vCRs.push_back(cr);
+						AddWoundData(w, vCRs[CH_F], crF);
+						AddWoundData(w, vCRs[CH_F], crF2);
+						AddWoundData(w, vCRs[CH_G], crG);
+						AddWoundData(w, vCRs[CH_G], crG2);
+						AddWoundData(w, vCRs[CH_E], crE);
+						AddWoundData(w, vCRs[CH_D], crDt);
+						vWounds.push_back(w);
+						break;
+					}
+				}
+			}
+		}
+
+		crDt.clear();
+		uint8_t iFindD_2 = GetCR(CH_D, cr.Step2 + 1, cr.Row1, cr.Step2 + 10, cr.Row2, blocks, vCRs[CH_D], crDt, i);
+		for (int k = 0; k < crDt.size(); ++k)
+		{
+			int step11 = 0, step12 = 0;
+			GetStepSteps(CH_D, vCRs[CH_D][crDt[k]], step11, step12, blocks, angleD, offsetD, head.step);
+			if (step11 >= stepD1 - 1 && step12 <= stepD2 + 1)
+			{
+				SetJudgedFlag(vCRs[CH_D], crDt, 1); //螺孔双波——4象限
+			}
+			CR_INFO t_info;
+			if (GetCRInfo(vCRs[CH_D][crDt[k]], t_info, DataA, blocks, angleD, offsetD, head.step, head.deviceP2.Restr[ACH_D], head.deviceP2.Trig[ACH_D], blockHead.gain[ACH_D]) && t_info.MaxV >= 150)
+			{
+				Wound_Judged w;
+				w.Block = vCRs[CH_D][crDt[k]].Block;
+				w.Step = vCRs[CH_D][crDt[k]].Step;
+				w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+				w.Place = WP_WAIST;
+				FillWound(w, blockHead, head);
+				w.Type = WOUND_TYPE::W_SCREW_CRACK2;
+				w.Degree = 4;
+				memcpy(w.Result, "导孔二象限斜裂纹", 30);
+				w.vCRs.push_back(cr);
+				SetJudgedFlag(vCRs[CH_D], crDt, 1);
+				AddWoundData(w, vCRs[CH_F], crF);
+				AddWoundData(w, vCRs[CH_F], crF2);
+				AddWoundData(w, vCRs[CH_G], crG);
+				AddWoundData(w, vCRs[CH_G], crG2);
+				AddWoundData(w, vCRs[CH_E], crE);
+				AddWoundData(w, vCRs[CH_D], crDt);
+				w.SizeX = head.step * (vCRs[CH_D][crDt[k]].Step2 - vCRs[CH_D][crDt[k]].Step1) / 0.8;
+				w.SizeY = 1;
+				sprintf_s(w.According, "D出波，位移：%.1f大格，幅值：%d", 0.02f * t_info.Shift, t_info.MaxV);
+				vWounds.push_back(w);
+				break;
 			}
 		}
 	}
 
-	Wound_Judged w;
-	if (ParseScrewHoleSew2(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, vCRs[iLoseCh][vF[0]], railType, w))
-	{
-		AddToWounds(vWounds, w);
-	}
 
-	memset(&w, 0, sizeof(Wound_Judged));
-	if (crD.size() > 1)
+	//分析crE
+	int idxE = -1;
+	int idxRow1 = 100;
+	for (int k = 0; k < crE.size(); ++k)
 	{
-		if (ParseScrewHoleSew4(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, vCRs[iLoseCh][vF[0]], railType, w))
+		if (crE.size() < 3)
 		{
-			//if (iIndex == 3 && w4.Type == W_SCREW_CRACK4)
-			//{
-			//	w4.Type == W_SCREW_CRACK4;
-			//	w4.According
-			//}
-			AddToWounds(vWounds, w);
+			continue;
+		}
+		if (vCRs[CH_E][crE[k]].Row1 < idxRow1)
+		{
+			idxE = crE[k];
+			idxRow1 = vCRs[CH_E][crE[k]].Row1;
 		}
 	}
 
-	memset(&w, 0, sizeof(Wound_Judged));
-	if (ParseScrewHoleSew1(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, vCRs[iLoseCh][vF[0]], railType, w))
+	if (idxE >= 0)
 	{
-		AddToWounds(vWounds, w);
-	}
-
-	if (crE.size() > 0)
-	{
-		memset(&w, 0, sizeof(Wound_Judged));
-		if (ParseScrewHoleSew3(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, vCRs[iLoseCh][vF[0]], railType, w))
+		GetStepSteps(CH_E, vCRs[CH_E][idxE], stepE1, stepE2, blocks, angleE, offsetE, head.step);
+		for (int k = 0; k < crE.size(); ++k)
 		{
-			//if (iIndex == 2 && w3.Type == W_SCR)
-			//{
-			//	
-			//}
-			AddToWounds(vWounds, w);
+			if (crE[k] == idxE)
+			{
+				continue;
+			}
+			int step11 = 0, step12 = 0;
+			GetStepSteps(CH_E, vCRs[CH_E][crE[k]], step11, step12, blocks, angleE, offsetE, head.step);
+			if (step11 >= stepD1 - 1 && step12 <= stepD2 + 1)
+			{
+				SetJudgedFlag(vCRs[CH_E], crE, 1); //螺孔双波——4象限
+			}
+			CR_INFO t_info;
+			if (GetCRInfo(vCRs[CH_E][crE[k]], t_info, DataA, blocks, angleE, offsetE, head.step, head.deviceP2.Restr[ACH_E], head.deviceP2.Trig[ACH_E], blockHead.gain[ACH_E]) && t_info.MaxV >= 150)
+			{
+				Wound_Judged w;
+				w.Block = vCRs[CH_E][crE[k]].Block;
+				w.Step = vCRs[CH_E][crE[k]].Step;
+				w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+				w.Place = WP_WAIST;
+				FillWound(w, blockHead, head);
+				w.Type = WOUND_TYPE::W_SCREW_CRACK1;
+				w.Degree = 4;
+				memcpy(w.Result, "导孔一限斜裂纹", 30);
+				w.vCRs.push_back(cr);
+				SetJudgedFlag(vCRs[CH_E], crE, 1);
+				AddWoundData(w, vCRs[CH_F], crF);
+				AddWoundData(w, vCRs[CH_F], crF2);
+				AddWoundData(w, vCRs[CH_G], crG);
+				AddWoundData(w, vCRs[CH_G], crG2);
+				AddWoundData(w, vCRs[CH_D], crD);
+				w.SizeX = head.step * (vCRs[CH_E][crE[k]].Step2 - vCRs[CH_E][crE[k]].Step1) / 0.8;
+				w.SizeY = 1;
+				sprintf_s(w.According, "E出波，位移：%.1f大格，幅值：%d", 0.02f * t_info.Shift, t_info.MaxV);
+				vWounds.push_back(w);
+				break;
+			}
+		}
+
+		vector<int> crEt;
+		GetCR(CH_E, vCRs[CH_E][idxE].Step1, cr.Row2 - 1, vCRs[CH_E][idxE].Step2 + 10, cr.Row2 + 10, blocks, vCRs[CH_E], crEt);
+		for (int k = 0; k < crEt.size(); ++k)
+		{
+			int step11 = 0, step12 = 0;
+			GetStepSteps(CH_E, vCRs[CH_E][crEt[k]], step11, step12, blocks, angleE, offsetE, head.step);
+			if (step11 >= stepD1 - 1 && step12 <= stepD2 + 1)
+			{
+				SetJudgedFlag(vCRs[CH_E], crEt, 1); //螺孔双波——3象限
+			}
+			CR_INFO t_info;
+			if (GetCRInfo(vCRs[CH_E][crEt[k]], t_info, DataA, blocks, angleE, offsetE, head.step, head.deviceP2.Restr[ACH_E], head.deviceP2.Trig[ACH_E], blockHead.gain[ACH_E]) && t_info.MaxV >= 150)
+			{
+				Wound_Judged w;
+				w.Block = vCRs[CH_E][crEt[k]].Block;
+				w.Step = vCRs[CH_E][crEt[k]].Step;
+				w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+				w.Place = WP_WAIST;
+				FillWound(w, blockHead, head);
+				w.Type = WOUND_TYPE::W_SCREW_CRACK3;
+				w.Degree = 4;
+				memcpy(w.Result, "导孔三象限斜裂纹", 30);
+				w.vCRs.push_back(cr);
+				SetJudgedFlag(vCRs[CH_E], crEt, 1);
+				AddWoundData(w, vCRs[CH_F], crF);
+				AddWoundData(w, vCRs[CH_F], crF2);
+				AddWoundData(w, vCRs[CH_G], crG);
+				AddWoundData(w, vCRs[CH_G], crG2);
+				AddWoundData(w, vCRs[CH_D], crD);
+				w.SizeX = head.step * (vCRs[CH_E][crEt[k]].Step2 - vCRs[CH_E][crEt[k]].Step1) / 0.8;
+				w.SizeY = 1;
+				sprintf_s(w.According, "E出波，位移：%.1f大格，幅值：%d", 0.02f * t_info.Shift, t_info.MaxV);
+				vWounds.push_back(w);
+				break;
+			}
 		}
 	}
 
-	memset(&w, 0, sizeof(Wound_Judged));
-	if (ParseScrewHoleCrackLeft(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, iFRow, vCRs[iLoseCh][vF[0]], w))
+
+	//分析导孔水平裂纹
+	int iLeft, iRight, iRow2 = cr.Row2;
+	if (cr.Channel == CH_D)
 	{
-		AddToWounds(vWounds, w);
+		iRight = cr.Step1;
+		iLeft = iRight + 10;
+	}
+	else
+	{
+		iLeft = cr.Step2;
+		iRight = iLeft - 10;
 	}
 
-	memset(&w, 0, sizeof(Wound_Judged));
-	if (ParseScrewHoleCrackRight(head, blocks[mBlockIndex[vCRs[iLoseCh][vF[0]].Block]].BlockHead, DataA, blocks, vCRs, iFRow, vCRs[iLoseCh][vF[0]], w))
+	vector<int> crFt, crGt;
+	GetCR(CH_F, iRight - 3, iRow2 + 1, iLeft + 3, iRow2 + 10, blocks, vCRs[CH_F], crFt);
+	GetCR(CH_G, iRight - 3, iRow2 + 1, iLeft + 3, iRow2 + 10, blocks, vCRs[CH_G], crGt);
+	for (int k = 0; k < crFt.size(); ++k)
 	{
-		AddToWounds(vWounds, w);
+		CR& cF = vCRs[CH_F][crFt[k]];
+		if (cF.Step1 >= iRight && cF.Step2 <= iLeft)
+		{
+			continue;
+		}
+		if (cF.Region.size() < 3)
+		{
+			continue;
+		}
+
+		Wound_Judged w;
+		w.Block = vCRs[CH_F][crFt[k]].Block;
+		w.Step = vCRs[CH_F][crFt[k]].Step;
+		w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+		w.Place = WP_WAIST;
+		FillWound(w, blockHead, head);
+		w.Type = WOUND_TYPE::W_SCREW_HORIZON_CRACK;
+		w.Degree = 4;
+		memcpy(w.Result, "导孔水平裂纹", 30);
+		w.vCRs.push_back(cr);
+		SetJudgedFlag(vCRs[CH_F], crFt, 1);
+		AddWoundData(w, vCRs[CH_F], crF);
+		AddWoundData(w, vCRs[CH_F], crF2);
+		AddWoundData(w, vCRs[CH_G], crG);
+		AddWoundData(w, vCRs[CH_G], crG2);
+		AddWoundData(w, vCRs[CH_D], crD);
+		w.SizeX = head.step * (vCRs[CH_F][crFt[k]].Step2 - vCRs[CH_F][crFt[k]].Step1);
+		w.SizeY = 1;
+		sprintf_s(w.According, "F出波");
+		vWounds.push_back(w);
+		break;
 	}
-	SetJudgedFlag(vCRs[CH_D], crD, 1);
-	SetJudgedFlag(vCRs[CH_E], crE, 1);
-	SetJudgedFlag(vCRs[CH_F], crF2, 1);
-	SetJudgedFlag(vCRs[CH_G], crG2, 1);
-	SetJudgedFlag(vCRs[CH_F], crF, 1);
-	SetJudgedFlag(vCRs[CH_G], crG, 1);
+
+	for (int k = 0; k < crGt.size(); ++k)
+	{
+		CR& cG = vCRs[CH_G][crGt[k]];
+		if (cG.Step1 >= iRight && cG.Step2 <= iLeft)
+		{
+			continue;
+		}
+		if (cG.Region.size() < 3)
+		{
+			continue;
+		}
+
+		Wound_Judged w;
+		w.Block = vCRs[CH_G][crGt[k]].Block;
+		w.Step = vCRs[CH_G][crGt[k]].Step;
+		w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
+		w.Place = WP_WAIST;
+		FillWound(w, blockHead, head);
+		w.Type = WOUND_TYPE::W_SCREW_HORIZON_CRACK;
+		w.Degree = 4;
+		memcpy(w.Result, "导孔水平裂纹", 30);
+		w.vCRs.push_back(cr);
+		SetJudgedFlag(vCRs[CH_G], crGt, 1);
+		AddWoundData(w, vCRs[CH_F], crF);
+		AddWoundData(w, vCRs[CH_F], crF2);
+		AddWoundData(w, vCRs[CH_G], crG);
+		AddWoundData(w, vCRs[CH_G], crG2);
+		AddWoundData(w, vCRs[CH_D], crD);
+		w.SizeX = head.step * (vCRs[CH_G][crGt[k]].Step2 - vCRs[CH_G][crGt[k]].Step1);
+		w.SizeY = 1;
+		sprintf_s(w.According, "F出波");
+		vWounds.push_back(w);
+		break;
+	}
+
+
 	return true;
 }
 
@@ -2106,11 +2307,11 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 				else if (m == CH_D)//D通道
 				{
 					Wound_Judged wound;
+					FillWound(wound, blockHead, head);
 					wound.Place = WP_WAIST;
 					wound.Walk = wd;
 					wound.Block = cr.Block;
 					wound.Step = cr.Step;
-					FillWound(wound, blockHead, head);
 					wound.vCRs.push_back(cr);
 
 					int iBottomRow = GetFRow(blocks[iBlock].vBStepDatas[cr.Step]);
@@ -2244,9 +2445,9 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 						{
 							//导孔F经常正常，没有区别，故采用DE来进行步进控制
 							int iStepGuide1 = cr.Step1, iStepGuide2 = cr.Step1 + 15;
-							ParseGuideHole(head, DataA, blocks, vCRs, iStepGuide1, iStepGuide2, iFRow, railType, 0, vWounds);
+							ParseGuideHole(head, DataA, blocks, vCRs, cr, railType, iDesiredFRow, railType, vWounds);
 						}
-						else if (crInfo.Shift >= 10 && bWhole)
+						else if (crInfo.MaxV >= 150 && bWhole)
 						{
 							wound.Type = WOUND_TYPE::W_SKEW_CRACK;
 							wound.Place = WP_WAIST;
@@ -2503,15 +2704,15 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 
 									int stepE1 = 0, stepE2 = 0;
 									GetStepSteps(CH_E, cr, stepE1, stepE2, blocks, 0.1 * head.deviceP2.Angle[ACH_E].Refrac, offset, head.step);
-									if (stepE1 >= step1 && stepE2 <= step2)//螺孔双波——3象限
+									if (stepE1 >= step1 - 1 && stepE2 <= step2 + 1)//螺孔双波——3象限
 									{
 									}
 									else
 									{
 										Wound_Judged w;
+										FillWound(w, blockHead, head);
 										w.Block = vCRs[CH_E][crEt[k]].Block;
 										w.Step = vCRs[CH_E][crEt[k]].Step;
-										FillWound(w, blockHead, head);
 										w.Walk = GetWD(blocks[mBlockIndex[w.Block]].BlockHead.walk, w.Step, head.step);
 										memcpy(w.Result, "螺孔三象限斜裂纹", 30);
 										w.Type = WOUND_TYPE::W_SCREW_CRACK3;
@@ -2645,8 +2846,8 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 									else
 									{
 										Wound_Judged w;
-										w.Block = cr.Block;
 										FillWound(w, blockHead, head);
+										w.Block = cr.Block;
 										w.Step = cr.Step;
 										w.Walk = GetWD(blocks[iBlock].BlockHead.walk, vCRs[CH_D][crDt[0]].Step1 - blocks[iBlock].BlockHead.indexL, head.step);
 										w.Type = WOUND_TYPE::W_SCREW_CRACK4;
@@ -2671,8 +2872,8 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 							for (int k = 0; k < crDt.size(); ++k)
 							{
 								Wound_Judged w;
-								w.Block = cr.Block;
 								FillWound(w, blockHead, head);
+								w.Block = cr.Block;
 								w.Step = cr.Step;
 								int idx_t = vCRs[CH_D][crDt[0]].Step1 - blocks[mBlockIndex[vCRs[CH_D][crDt[0]].Block]].BlockHead.indexL;
 								w.Walk = GetWD(blocks[iBlock].BlockHead.walk, idx_t, head.step);
@@ -2691,14 +2892,14 @@ void Analyse(F_HEAD& head, BlockData_A& DataA, vector<BlockData_B>& blocks, vect
 								AddToWounds(vWounds, w);
 							}
 						}
-						else if (crInfo.Shift >= 10 && bWhole)
+						else if (crInfo.MaxV >= 150 && bWhole)
 						{
+							FillWound(wound, blockHead, head);
 							wound.Block = cr.Block;
 							wound.Step = cr.Step;
 							wound.Type = WOUND_TYPE::W_SKEW_CRACK;
 							wound.Place = WP_WAIST;
 							wound.Degree = 4;
-							FillWound(wound, blockHead, head);
 							memcpy(wound.Result, "斜裂纹,重伤", 30);
 							wound.SizeX = head.step * (cr.Row2 - cr.Row1) / 0.6;
 							wound.SizeY = 1;
@@ -2965,10 +3166,7 @@ bool	GetStepSteps(uint8_t channel, Connected_Region& cr, int32_t& step1, int32_t
 	int32_t iBeginStep = 0x7FFFFFFF, iEndStep = 0 - iBeginStep;
 	Connected_Region cr_temp = cr;
 
-	//double rad = acos(cos(angle * AngleToRad) * cos(angle2 * AngleToRad));
 	double rad = angle * AngleToRad;
-	bool bFind = false;
-
 	for (int i = 0; i < cr_temp.Region.size(); ++i)
 	{
 		WaveData& wd = cr_temp.Region[i];
@@ -3340,7 +3538,7 @@ uint8_t GetCR(uint8_t channel, int step1, int step2, vector<BlockData_B>& vBData
 	{
 		if (crToFind[i].Step1 > step2)
 		{
-			break;;
+			break;
 		}
 		if (crToFind[i].Step2 < step1 || crToFind[i].Region.size() < iMinimunSize)
 		{
@@ -3361,7 +3559,7 @@ uint8_t GetCR(uint8_t channel, int step1, uint8_t row1, int step2, uint8_t row2,
 		Connected_Region& cr = crToFind[i];
 		if (cr.Step1 > step2)
 		{
-			break;;
+			break;
 		}
 
 		int mi = min(cr.Row1, cr.Row2);
@@ -3396,16 +3594,9 @@ double GetWD(W_D pos)
 
 double GetWD(W_D pos, int nStep, float stepDistance, bool direction)
 {
-	double wd = pos.Km * 1000 + pos.m + 0.001 * pos.mm;
-	double r = 0.001 * nStep * stepDistance;
-	if (direction)
-	{
-		return 0.001 * (wd + r);
-	}
-	else
-	{
-		return 0.001 * (wd - r);
-	}
+	double wd = pos.Km + 0.001 * pos.m + 0.000001 * pos.mm;
+	double r = 0.000001 * nStep * stepDistance;
+	return direction ? wd + r : wd - r;
 }
 
 bool FindNextJoint(int block, int step, vector<BlockData_B>& blocks, int* destBlock, int * destStep)
@@ -3518,51 +3709,91 @@ void	CombineOutputData(vector<Position_Mark>& vPMs, vector<Wound_Judged>& vWound
 	}
 	vPMs = vPM2;
 
-	if (g_direction)//顺里程
+	//补全伤损的位置信息
+	int iBeginIndex1 = 0, iBeginIndex2 = 0, iBeginIndex3 = 0;
+	for (int i = 0; i < vWounds.size(); ++i)
 	{
-		for (int i = 0; i < vWounds.size(); ++i)
+		uint64_t bID = IsInBridge(vWounds[i].Walk, vBridges, iBeginIndex1);
+		if (bID > 0)
 		{
-			for (int j = 0; j < vTunnels.size(); ++j)
-			{
-				if (vWounds[i].Walk >= vTunnels[j].Start && vWounds[i].Walk >= vTunnels[j].End)
-				{
-					vWounds[i].TunnelID = vTunnels[i].id;
-				}
-				if (vTunnels[j].Start > vWounds[i].Walk)
-				{
-					break;
-				}
-			}
+			vWounds[i].BridgeID = bID;
+		}
 
-			for (int j = 0; j < vBridges.size(); ++j)
-			{
-				if (vWounds[i].Walk >= vBridges[j].Start && vWounds[i].Walk >= vBridges[j].End)
-				{
-					vWounds[i].TunnelID = vBridges[i].id;
-				}
-				if (vBridges[j].Start > vWounds[i].Walk)
-				{
-					break;
-				}
-			}
+		uint64_t cID = IsInCurve(vWounds[i].Walk, vCurves, iBeginIndex2);
+		if (cID > 0)
+		{
+			vWounds[i].CurveID = cID;
+		}
 
-			for (int j = 0; j < vCurves.size(); ++j)
-			{
-				if (vWounds[i].Walk >= vCurves[j].Start && vWounds[i].Walk >= vCurves[j].End)
-				{
-					vWounds[i].TunnelID = vCurves[i].id;
-				}
-				if (vCurves[j].Start > vWounds[i].Walk)
-				{
-					break;
-				}
-			}
+		uint64_t tID = IsInTunnel(vWounds[i].Walk, vTunnels, iBeginIndex3);
+		if (tID > 0)
+		{
+			vWounds[i].TunnelID = tID;
 		}
 	}
-	else//逆里程
-	{
+}
 
+uint64_t IsInBridge(double walk, vector<Bridge>& vBridges, int& iBeginIndex)
+{
+	for (int i = iBeginIndex; i < vBridges.size(); ++i)
+	{
+		if (vBridges[i].Start > walk)
+		{
+			return 0;
+		}
+		else if (vBridges[i].Start <= walk && vBridges[i].End >= walk)
+		{
+			iBeginIndex = i;
+			return vBridges[i].id;
+		}
+		else
+		{
+			iBeginIndex++;
+		}
 	}
+	return 0;
+}
+
+uint64_t IsInCurve(double walk, vector<Curve>& vCurves, int& iBeginIndex)
+{
+	for (int i = iBeginIndex; i < vCurves.size(); ++i)
+	{
+		if (vCurves[i].Start > walk)
+		{
+			return 0;
+		}
+		else if (vCurves[i].Start <= walk && vCurves[i].End >= walk)
+		{
+			iBeginIndex = i;
+			return vCurves[i].id;
+		}
+		else
+		{
+			iBeginIndex++;
+		}
+	}
+	return 0;
+}
+
+uint64_t	IsInTunnel(double walk, vector<Tunnel>& vTunnels, int& iBeginIndex)
+{
+	for (int i = iBeginIndex; i < vTunnels.size(); ++i)
+	{
+		if (vTunnels[i].Start > walk)
+		{
+			return 0;
+		}
+		else if (vTunnels[i].Start <= walk && vTunnels[i].End >= walk)
+		{
+			iBeginIndex = i;
+			return vTunnels[i].id;
+		}
+		else
+		{
+			iBeginIndex++;
+		}
+	}
+	return 0;
 }
 
 

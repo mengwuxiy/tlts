@@ -44,7 +44,7 @@ BOOL CtltsDoc::OnNewDocument()
 
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
-
+	this->SetTitle("ÉËËğÅĞ¶¨Èí¼ş");
 	return TRUE;
 }
 

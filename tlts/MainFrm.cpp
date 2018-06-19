@@ -56,13 +56,13 @@ CMainFrame::CMainFrame()
 	// TODO: add member initialization code here
 	theApp.m_nAppLook = theApp.GetInt(_T("ApplicationLook"), ID_VIEW_APPLOOK_VS_2008);
 
+	m_bOpen = FALSE;
 	m_pFileA = NULL;
 	m_pFileB = NULL;
 
 	m_bSolving = FALSE;
-	m_bOpen = FALSE;
-	m_bLoaded = FALSE;
 	m_bReadingB = FALSE;
+	m_bLoaded = FALSE;
 
 	m_jugedHandle = CreateEvent(NULL, TRUE, TRUE, "Judge");
 
@@ -73,8 +73,8 @@ CMainFrame::CMainFrame()
 
 CMainFrame::~CMainFrame()
 {
-	m_ts.Close();
 	CloseHandle(m_jugedHandle);
+	m_ts.Close();
 }
 
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -361,8 +361,7 @@ void	CMainFrame::OnAccept(CSocketEx* sock)
 		sock2->GetPeerName(rPeerAddress, rPeerPort);
 		CString str;
 		str.Format("%s:%d", rPeerAddress, rPeerPort);
-		m_vList.insert( make_pair(str, 1));
-		m_vSocks.insert(make_pair(sock2, 1));
+		m_vSocks.insert(make_pair(sock2, str));
 		sock2->SetParent((DWORD_PTR)this);
 		sock2->AsyncSelect(FD_READ | FD_WRITE | FD_CLOSE);
 		//sock2->Send("1234", 5);
@@ -379,7 +378,6 @@ void	CMainFrame::OnReceive(CSocketEx* sock)
 		return;
 	}
 
-	//只处理来自主控软件的信息
 	CString label(temp);
 	CString strBytes = label.Left(11);
 	CString strCode = label.Mid(11, 4);
@@ -418,7 +416,7 @@ void	CMainFrame::OnSocketClose(CSocketEx* sock)
 	//str.Format("%s:%d", ip, port);
 	//m_vList.erase(m_vList.find(str));
 
-	map<CSocketEx*, uint8_t>::iterator itr = m_vSocks.find(sock);
+	map<CSocketEx*, CString>::iterator itr = m_vSocks.find(sock);
 	if (itr!=m_vSocks.end())
 	{
 		m_vSocks.erase(itr);
@@ -441,6 +439,7 @@ LRESULT CMainFrame::OnMessageReCreateWebCom(WPARAM wParam, LPARAM lParam)
 
 BOOL CMainFrame::CreateWebCom()
 {
+	/*
 	CString strDir = g_strModuleFolder + "\\mysql.cfg";
 	CStdioFile file;
 	file.Open(strDir, CFile::modeRead);
@@ -449,7 +448,7 @@ BOOL CMainFrame::CreateWebCom()
 	file.ReadString(strUser);
 	file.ReadString(strPwd);
 	file.ReadString(strDB);
-
+	*/
 
 	BOOL bSuccess = m_ts.Create(4666, SOCK_STREAM, 63);
 	if (!bSuccess)
@@ -932,7 +931,7 @@ LRESULT CMainFrame::ONMessageFinish(WPARAM wParam, LPARAM lParam)
 	str.Format("%I64d", g_FileID);
 	SendUTF8(str, 1002, p->pSock);
 	delete p;
-	//AfxMessageBox("Finish");
+	AfxMessageBox("Finish");
 	return 0L;
 }
 

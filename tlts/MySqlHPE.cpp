@@ -2,6 +2,7 @@
 
 #include "MySqlHPE.h"
 #include "SolveData.h"
+//#pragma comment(lib, "libmysqld.lib")
 
 char szFileName[250] = { 0 };
 char szLineWay[][2] = { "D", "S", "X" };
@@ -571,11 +572,11 @@ bool CMySqlHPE::AddCRs(vector<Connected_Region> & vcr)
 	strSql = _T("insert into tpb_data(s_step, s_row, c_id) values");
 	for (int i = 0; i < vcr.size(); ++i)
 	{
-		vcr[i].CRID = crID + i;
-		vcr[i].WorkID = g_FileID;
+		//vcr[i].CRID = crID + i;
+		//vcr[i].WorkID = g_FileID;
 		for (int j = 0; j < vcr[i].Region.size(); ++j)
 		{
-			strTemp.Format("(%d, %d, %I64d),", vcr[i].Region[j].step - vcr[i].Step1, vcr[i].Region[j].row, vcr[i].CRID);
+		//	strTemp.Format("(%d, %d, %I64d),", vcr[i].Region[j].step - vcr[i].Step1, vcr[i].Region[j].row, vcr[i].CRID);
 			strSql += strTemp;
 		}
 	}
@@ -622,7 +623,7 @@ bool CMySqlHPE::UpdateCR(Connected_Region& cr)
 		if (strA.GetLength() > 0)
 		{
 			strA = strA.Left(strA.GetLength() - 1);
-			strTemp.Format("(%I64d, %d, %d, '%s'),", cr.CRID, cr.Step1, cr.vASteps[j].Index2, strA);
+		//	strTemp.Format("(%I64d, %d, %d, '%s'),", cr.CRID, cr.Step1, cr.vASteps[j].Index2, strA);
 			strSql += strTemp;
 		}
 	}
@@ -696,7 +697,7 @@ bool CMySqlHPE::GetPositionMarks(CString strRailNo, uint8_t xingbie, uint8_t gub
 		pm.Gubie = gubie;
 		pm.gps_log = atof(row[6]);
 		pm.gps_lat = atof(row[7]);
-		pm.Mark = atof(row[8]);
+		pm.Mark = strtol(row[8], NULL, 10);
 		pm.Walk = atof(row[18]);
 		vPMs.push_back(pm);
 	}

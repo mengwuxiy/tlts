@@ -96,20 +96,24 @@ BOOL CtltsApp::InitInstance()
 	file.ReadString(strUser);
 	file.ReadString(strPwd);
 	file.ReadString(strDB);
+	//CString strCmd; 
+	//CString swMode;
+	//file.ReadString(strCmd);
+	//file.ReadString(swMode);
+	file.Close();
 	if (theApp.sql.IsConnected())
 	{
 		theApp.sql.CloseConn();
 	}
 	if (theApp.sql.ConnectDatabase(strServer, strUser, strPwd, strDB) == false)
-	{
-		file.Close();
+	{		
 		//CString strError;
 		AfxMessageBox(theApp.sql.GetErrorMsg());
 		return FALSE;
 	}
-	file.Close();
-
-
+	//ShellExecute(NULL, "Open", strExe, NULL, NULL, SW_MAXIMIZE);
+	
+	//WinExec(strCmd, StrToInt(swMode));
 
 	AfxEnableControlContainer();
 
@@ -216,8 +220,18 @@ END_MESSAGE_MAP()
 // App command to run the dialog
 void CtltsApp::OnAppAbout()
 {
+	CString strFile = _T("");
+	CFileDialog    dlgFile(TRUE, NULL, NULL, OFN_HIDEREADONLY, _T("tpB Files (*.tpB)|*.tpB|All Files (*.*)|*.*||"), NULL);
+
+	if (dlgFile.DoModal())
+	{
+		strFile = dlgFile.GetPathName();
+	}
+
+	strFile.Replace('\\', '/');
+
 	CMainFrame* pframe = (CMainFrame*)AfxGetApp()->m_pMainWnd;
-	pframe->JudgeTPB("D:/Files/180528Q0008SLS_0006_17S2003.tpB", NULL);
+	pframe->JudgeTPB(strFile, NULL);
 	//CAboutDlg aboutDlg;
 	//aboutDlg.DoModal();
 }

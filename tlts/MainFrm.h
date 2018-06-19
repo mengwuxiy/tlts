@@ -70,8 +70,7 @@ public://ÍøÂçÍ¨ÐÅ
 	void			OnConnect(CSocketEx* sock);
 	void			OnOutOfBandData(CSocketEx* sock);
 
-	map<CString,uint8_t>		m_vList;
-	map<CSocketEx*, uint8_t>	m_vSocks;
+	map<CSocketEx*, CString>	m_vSocks;
 	
 
 public:
